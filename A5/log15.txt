@@ -1,0 +1,42 @@
+Execution stack: 
+openRFile(var_f, "test.in")
+print (read(a))
+
+Symbol Table: 
+
+Output: 
+
+File Table:
+
+
+Heap:
+
+
+Execution stack: 
+print (read(a))
+
+Symbol Table: 
+var_f=>1
+
+Output: 
+
+File Table:
+
+1=>test.in
+
+Heap:
+
+
+Execution stack: 
+
+Symbol Table: 
+var_f=>1
+
+Output: 
+
+File Table:
+
+
+Heap:
+
+

@@ -1,0 +1,13 @@
+Execution stack: 
+
+Symbol Table: 
+
+Output: 
+11
+
+File Table:
+
+
+Heap:
+
+

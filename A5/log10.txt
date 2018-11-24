@@ -1,0 +1,217 @@
+Execution stack: 
+v=10
+(new(v, 20); (new(a, 22); (write(a, 30); (print (a); (print (read(a)); a=0)))))
+
+Symbol Table: 
+
+Output: 
+
+File Table:
+
+
+Heap:
+
+
+Execution stack: 
+(new(v, 20); (new(a, 22); (write(a, 30); (print (a); (print (read(a)); a=0)))))
+
+Symbol Table: 
+v=>10
+
+Output: 
+
+File Table:
+
+
+Heap:
+
+
+Execution stack: 
+new(v, 20)
+(new(a, 22); (write(a, 30); (print (a); (print (read(a)); a=0))))
+
+Symbol Table: 
+v=>10
+
+Output: 
+
+File Table:
+
+
+Heap:
+
+
+Execution stack: 
+(new(a, 22); (write(a, 30); (print (a); (print (read(a)); a=0))))
+
+Symbol Table: 
+v=>1
+
+Output: 
+
+File Table:
+
+
+Heap:
+
+1=>20
+
+Execution stack: 
+new(a, 22)
+(write(a, 30); (print (a); (print (read(a)); a=0)))
+
+Symbol Table: 
+v=>1
+
+Output: 
+
+File Table:
+
+
+Heap:
+
+1=>20
+
+Execution stack: 
+(write(a, 30); (print (a); (print (read(a)); a=0)))
+
+Symbol Table: 
+a=>2
+v=>1
+
+Output: 
+
+File Table:
+
+
+Heap:
+
+1=>20
+2=>22
+
+Execution stack: 
+write(a, 30)
+(print (a); (print (read(a)); a=0))
+
+Symbol Table: 
+a=>2
+v=>1
+
+Output: 
+
+File Table:
+
+
+Heap:
+
+1=>20
+2=>22
+
+Execution stack: 
+(print (a); (print (read(a)); a=0))
+
+Symbol Table: 
+a=>2
+v=>1
+
+Output: 
+
+File Table:
+
+
+Heap:
+
+1=>20
+2=>30
+
+Execution stack: 
+print (a)
+(print (read(a)); a=0)
+
+Symbol Table: 
+a=>2
+v=>1
+
+Output: 
+
+File Table:
+
+
+Heap:
+
+1=>20
+2=>30
+
+Execution stack: 
+(print (read(a)); a=0)
+
+Symbol Table: 
+a=>2
+v=>1
+
+Output: 
+2
+
+File Table:
+
+
+Heap:
+
+1=>20
+2=>30
+
+Execution stack: 
+print (read(a))
+a=0
+
+Symbol Table: 
+a=>2
+v=>1
+
+Output: 
+2
+
+File Table:
+
+
+Heap:
+
+1=>20
+2=>30
+
+Execution stack: 
+a=0
+
+Symbol Table: 
+a=>2
+v=>1
+
+Output: 
+2
+30
+
+File Table:
+
+
+Heap:
+
+1=>20
+2=>30
+
+Execution stack: 
+
+Symbol Table: 
+a=>0
+v=>1
+
+Output: 
+2
+30
+
+File Table:
+
+
+Heap:
+
+1=>20
+
