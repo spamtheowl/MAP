@@ -28,6 +28,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import javafx.scene.layout.HBox;
+import javafx.collections.*;
 import stmt.*;
 import exp.*;
 import repository.*;
@@ -242,52 +243,58 @@ public class Main extends Application
 
 		run1Step.setOnAction(e ->
 		{
-			ArrayList<PrgState> list = ctrl.getRep().getPrgList();
-			//list.get(0).oneStep();
-			this.exeStack.getItems().clear();
+			List<PrgState> prgList=ctrl.removeCompletedPrg(ctrl.getRep().getPrgList());
+			try
+			{
+				ctrl.OneStepGUI();
+			}
+			catch (IOException | MyStmtException | InterruptedException e1)
+			{
+				AlertBox.display("Exception", e1.getMessage());
+				e1.printStackTrace();
+			}
 			this.out.getItems().clear();
 			this.prgStates.getItems().clear();
 			this.heapTable.getItems().clear();
 			this.fileTable.getItems().clear();
-			this.symTable.getItems().clear();
-			ArrayList<String> ids = new ArrayList<String> ();
-
-//			try
-//			{
-//				ctrl.oneStepForAllPrg(list);
-//			}
-//			catch (InterruptedException e2)
-//			{
-//				AlertBox.display("Exception", e2.getMessage());
-//				e2.printStackTrace();
-//			}
-
-			list.forEach(prg->
+			ArrayList<String> ids = new ArrayList<String>();
+			ids.addAll(this.ctrl.getRep().getPrgIds());
+			prgListId = FXCollections.observableArrayList(ids);
+			this.prgStates.setItems(prgListId);
+			prgList.forEach(prg->
 			{
-				ctrl.conservativeGarbageCollector(prg.getSymTable().values(), prg.getHeap().getContent());
-				try
-				{
-					prg.oneStep();
-				}
-				catch (MyStmtException | IOException e1)
-				{
-					AlertBox.display("Exception", e1.getMessage());
-					e1.printStackTrace();
-				}
-
-				this.exeStack.getItems().addAll(prg.getExeStack().toString());
 				this.out.getItems().addAll(prg.getOut().toString());
 				ObservableList<Entry<Integer, Integer>> items0 = FXCollections.observableArrayList(prg.getHeap().entrySet());
 				this.heapTable.setItems(items0);
 				ObservableList<Entry<Integer, MyTuple<String, BufferedReader>>> items1 = FXCollections.observableArrayList(prg.getFileTable().entrySet());
 				this.fileTable.setItems(items1);
-				ObservableList<Entry<String, Integer>> items2 = FXCollections.observableArrayList(prg.getSymTable().entrySet());
-
-				this.symTable.setItems(items2);
 			});
-				ids.addAll(this.ctrl.getRep().getPrgIds());
-				prgListId = FXCollections.observableArrayList(ids);
-				this.prgStates.setItems(prgListId);
+
+			this.prgStates.setOnMouseClicked(event ->
+			{
+				int index = this.prgStates.getSelectionModel().getSelectedIndex();
+				//this.currentPrg.setText(Integer.toString(index));
+				try
+				{
+					if (index != -1)
+					{
+						this.exeStack.getItems().clear();
+						this.symTable.getItems().clear();
+
+						this.exeStack.getItems().addAll(ctrl.getRep().getPrgList().get(index).getExeStack().toString());
+						ObservableList<Entry<String, Integer>> items2 = FXCollections.observableArrayList(ctrl.getRep().getPrgList().get(index).getSymTable().entrySet());
+						this.symTable.setItems(items2);
+					}
+				}
+					catch(Exception ee)
+					{
+						AlertBox.display("Exception", ee.getMessage());
+						ee.printStackTrace();
+					}
+			});
+
+
+
 //				try
 //				{
 //					this.ctrl.getRep().logPrgStateExec(prg);
