@@ -1,13 +1,12 @@
 package controller;
 import java.util.*;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
-
 import dictionary.*;
-
-import stack.*;
+import javax.print.attribute.standard.PrinterLocation;import stack.*;
 import stmt.*;
 import tuple.MyITuple;
 import tuple.MyTuple;
@@ -16,7 +15,7 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import exp.PrgState;
+import exp.*;
 import model.*;
 import repository.*;
 
@@ -24,9 +23,13 @@ public class Controller
 {
 	private IRepository rep;
 	ExecutorService executor;
+	boolean StepDone;
+	boolean startThreads;
 	public Controller(IRepository rep)
 	{
+		StepDone = false;
 		this.rep = rep;
+		startThreads=true;
 	}
 	public IRepository getRep()
 	{
@@ -54,43 +57,44 @@ public class Controller
 
 	public void oneStepForAllPrg(List<PrgState> prgList) throws InterruptedException
 	{
-		prgList.forEach(prg->{
+		prgList.forEach(prog->{
 			try
 			{
-				rep.logPrgStateExec(prg);
+				rep.logPrgStateExec(prog);
 			}
 			catch (IOException e)
 			{
-				e.printStackTrace();
+				System.out.println(e);
 			}
+
 		});
-		List<Callable<PrgState>> callList = prgList.stream().map((PrgState p) -> (Callable<PrgState>)(()-> { return p.oneStep(); }))
-				.collect(Collectors.toList());
+		List<Callable<PrgState>> callList = prgList.stream()
+				 .map((PrgState p) -> (Callable<PrgState>)(() -> {return p.oneStep();}))
+				 .collect(Collectors.toList());
 		List<PrgState> newPrgList = executor.invokeAll(callList).stream()
 				.map(future->{
-					try
+				try
 					{
 						return future.get();
 					}
-					catch(Exception e)
-					{
-						System.out.println(e.getMessage());
-						return null;
-					}
+				catch (Exception d)
+				{
+					System.out.println(d);
+					return null;
+				}
 				})
-				.filter(p->p!=null).collect(Collectors.toList());
+			.filter(p->p!=null)
+			.collect(Collectors.toList());
 		prgList.addAll(newPrgList);
 		prgList.forEach(prg->{
-			try
-			{
+			try {
 				rep.logPrgStateExec(prg);
-			}
+				}
 			catch (IOException e)
 			{
-				System.out.println(e.getMessage());
-				e.printStackTrace();
+				System.out.println(e);
 			}
-		});
+			});
 		rep.setPrgList(prgList);
 	}
 	public void allStep() throws InterruptedException, MyStmtException
@@ -118,4 +122,52 @@ public class Controller
 		});
 		rep.setPrgList(prgList);
 	}
+
+	public void OneStepGUI() throws IOException, MyStmtException, InterruptedException
+	{
+        if (this.startThreads)
+        {
+            this.startThreads = false;
+            this.executor = Executors.newFixedThreadPool(2);
+        }
+		 List<PrgState> prgList=removeCompletedPrg(rep.getPrgList());
+		 if (prgList.size() > 0)
+		 {
+				prgList.forEach(prg->prg.getHeap().setContent(conservativeGarbageCollector(prg.getSymTable().getContent().values(),
+						 prg.getHeap().getContent())));
+			 oneStepForAllPrg(prgList);
+         }/*
+			 prgList=removeCompletedPrg(_repo.getPrgList());
+			 if (prgList.size()==0)
+			 {
+				 StepDone=true;
+				 executor.shutdownNow();
+				 prgList.forEach(prg->prg.removeFiles());
+				 _repo.setPrgList(prgList);
+			 }
+	     */
+
+		// }
+
+		 else
+		 {
+			 StepDone=true;
+			 executor.shutdownNow();
+			 prgList.forEach(prg->
+			 {
+				try
+				{
+					closeAllFiles(prg);
+				}
+				catch (MyStmtException e)
+				{
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			});
+			 rep.setPrgList(prgList);
+		 }
+
+	}
+
 }
